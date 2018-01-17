@@ -1,0 +1,8 @@
+numpy
+scipy
+nltk
+scikit-learn
+requests
+bs4
+chardet
+w3lib
