@@ -74,7 +74,7 @@ class Classifier:
         meta_pages = pages[-number_for_meta_learning:]
         meta_categories = [p.category for p in meta_pages]
 
-        combined_prediction = self._base_predict_and_combine(meta_pages)
+        combined_prediction = self._make_and_combine_base_predictions(meta_pages)
         self.meta_classifier.fit(combined_prediction, meta_categories)
 
     def _fit_base_classifiers(self, pages):
@@ -90,10 +90,10 @@ class Classifier:
         self.h1_classifier.fit(h1_features, categories)
 
     def predict(self, pages):
-        combined_prediction = self._base_predict_and_combine(pages)
+        combined_prediction = self._make_and_combine_base_predictions(pages)
         return self.meta_classifier.predict(combined_prediction)
 
-    def _base_predict_and_combine(self, pages):
+    def _make_and_combine_base_predictions(self, pages):
         url_features = self.url_vectorizer.transform([p.clean_url() for p in pages])
         url_prediction = self.url_classifier.predict_proba(url_features)
 
