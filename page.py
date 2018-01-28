@@ -1,7 +1,7 @@
 import re
 
 
-class Website:
+class Page:
     def __init__(self, url, category, title='', h1='', purpose='train'):
         self.url = url
         self.category = category

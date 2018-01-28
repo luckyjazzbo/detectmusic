@@ -4,43 +4,43 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import f1_score
 from random import shuffle
 from bs4 import BeautifulSoup
-from website import Website
+from page import Page
 import csv
 import download
 
 
 def prepare_training_data():
-    websites = []
+    pages = []
 
     with open('music_urls_2.csv', 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         for row in reader:
             if row[3] == '3':
-                website = Website(row[0], 0)
+                page = Page(row[0], 0)
             elif row[2] == '2':
-                website = Website(row[0], 1)
+                page = Page(row[0], 1)
             elif row[1] == '1':
-                website = Website(row[0], 2)
+                page = Page(row[0], 2)
             else:
                 raise ValueError('Invalid row - {}'.format(str(row)))
 
-            body = download.get_with_cache(website.url)
+            body = download.get_with_cache(page.url)
 
             if len(body) > 0:
                 soup = BeautifulSoup(body, 'html.parser')
-                website.title = soup.title.string
+                page.title = soup.title.string
                 headers = soup.find_all('h1')
                 if len(headers) > 0:
-                    website.h1 = str(headers[0].text)
-                websites.append(website)
+                    page.h1 = str(headers[0].text)
+                pages.append(page)
 
-    shuffle(websites)
+    shuffle(pages)
 
-    test_size = int(0.4 * len(websites))
-    for website in websites[-test_size:]:
-        website.purpose = 'test'
+    test_size = int(0.4 * len(pages))
+    for p in pages[-test_size:]:
+        p.purpose = 'test'
 
-    return websites
+    return pages
 
 
 class Classifier:
@@ -70,10 +70,10 @@ class Classifier:
 if __name__ == '__main__':
     data = prepare_training_data()
 
-    train_words = [ex.keywords() for ex in data if ex.purpose == 'train']
-    train_categories = [ex.category for ex in data if ex.purpose == 'train']
-    test_words = [ex.keywords() for ex in data if ex.purpose == 'test']
-    test_categories = [ex.category for ex in data if ex.purpose == 'test']
+    train_words = [p.keywords() for p in data if p.purpose == 'train']
+    train_categories = [p.category for p in data if p.purpose == 'train']
+    test_words = [p.keywords() for p in data if p.purpose == 'test']
+    test_categories = [p.category for p in data if p.purpose == 'test']
 
     classifier = Classifier()
     classifier.learn_features(train_words)
@@ -84,6 +84,6 @@ if __name__ == '__main__':
 
     print('F1 score: {}'.format(f1))
 
-    for predicted, real, example in zip(list(prediction), test_categories, [ex for ex in data if ex.purpose == 'test']):
+    for predicted, real, page in zip(list(prediction), test_categories, [p for p in data if p.purpose == 'test']):
         if predicted != real:
-            print(predicted, real, example.url, example.keywords())
+            print(predicted, real, page.url, page.keywords())
