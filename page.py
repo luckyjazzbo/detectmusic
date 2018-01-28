@@ -13,6 +13,12 @@ class Page:
         text = '{} {} {}'.format(self.clean_url(), self.title, self.h1)
         return re.sub(r'\s+', ' ', text)
 
+    def clean_title(self):
+        return re.sub(r'\s+', ' ', self.title)
+
+    def clean_h1(self):
+        return re.sub(r'\s+', ' ', self.h1)
+
     def clean_url(self):
         res = re.sub(r'^https?://[^/]+', '', self.url)
         res = re.sub(r'\.html$', '', res)
