@@ -1,7 +1,7 @@
 import re
 
 
-class Example:
+class Website:
     def __init__(self, url, category, title='', h1='', purpose='train'):
         self.url = url
         self.category = category
